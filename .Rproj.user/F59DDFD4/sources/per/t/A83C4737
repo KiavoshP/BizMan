@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1579042056137.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "A83C4737",
+    "lastKnownWriteTime" : 8030879312480528756,
+    "last_content_update" : 1579042056137,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "322F0590",
+        "caption" : "inp",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=inp&cache_key=322F0590",
+        "displayedObservations" : 43,
+        "environment" : "",
+        "expression" : "inp",
+        "object" : "inp",
+        "preview" : 0,
+        "totalObservations" : 43,
+        "variables" : 5
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

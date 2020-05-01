@@ -1,0 +1,1 @@
+UPDATE pending_orders SET Item_Quantity = '7', Item_Name = 'Khom Say Deo', Item_Net_Price = '95000', Item_Total_Price = '665000' WHERE id = 'KK3756942';

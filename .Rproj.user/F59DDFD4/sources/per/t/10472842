@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1573596600473.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "9|12|64|2|\n11|11|16|2|\n20|32|48|2|\n50|28|54|2|\n55|31|62|2|\n65|20|213|4|\n69|11|74|2|\n75|11|80|2|\n90|34|141|2|\n143|39|145|2|\n146|39|148|2|\n149|39|151|2|\n152|39|154|2|\n155|39|157|2|\n158|39|160|2|\n161|39|163|2|\n164|39|172|2|\n177|29|181|2|\n185|32|187|2|\n206|36|208|2|\n268|25|273|2|\n275|42|280|2|\n284|41|293|2|\n",
+    "hash" : "4126134694",
+    "id" : "10472842",
+    "lastKnownWriteTime" : 1580077856,
+    "last_content_update" : 1580077856318,
+    "path" : "~/Desktop/BusinessApp/OnlineBusinessManager/server.R",
+    "project_path" : "server.R",
+    "properties" : {
+        "cursorPosition" : "237,38",
+        "scrollLine" : "0",
+        "tempName" : "Untitled2"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
