@@ -3,6 +3,7 @@ library(DT)
 library(shinyBS)
 library(gridExtra)
 library(rmarkdown)
+library(gtools)
 source("Back.R")
 source("pipe.r")
 shinyServer(function(input, output, session) {
@@ -214,73 +215,106 @@ shinyServer(function(input, output, session) {
   })
   # ---- Financial Managmet ----
   output$finance <- renderUI ({
-    navbarPage("Finance",
-      tabPanel("Manual Input",
+    box(width = "full",
                box(width = "full",
                    verticalLayout(
                      fluidRow(
-                       column(4, selectInput("ManoperatorName", "Operator", choices = c("Phuong Nguyen"="PN", "MY TO"="MT", "Kia Peynbard"="KP"))),
-                       column(4, offset = 4, dateInput("invoiceDate", "Date", value = Sys.Date()))
-                     ),p("***Please Use CSV Input for Items More than 4 Accorance", style = "color:red"),
-                     hr(),
-                     fluidRow(column(2,numericInput("quant1", "Quantity", value = 0)),column(4,textInput("invItmName1", "Item")),column(3,numericInput("amountCost1", "Cost/Unit", value = 0)),column(3,selectInput("opType1", "Operetive", c("Income" = "1", "Cost" = "0")))),
-                     fluidRow(column(2,numericInput("quant2", "Quantity", value = 0)),column(4,textInput("invItmName2", "Item")),column(3,numericInput("amountCost2", "Cost/Unit", value = 0)),column(3,selectInput("opType2", "Operetive", c("Income" = "1", "Cost" = "0")))),
-                     fluidRow(column(2,numericInput("quant3", "Quantity", value = 0)),column(4,textInput("invItmName3", "Item")),column(3,numericInput("amountCost3", "Cost/Unit", value = 0)),column(3,selectInput("opType3", "Operetive", c("Income" = "1", "Cost" = "0")))),
-                     fluidRow(column(2,numericInput("quant4", "Quantity", value = 0)),column(4,textInput("invItmName4", "Item")),column(3,numericInput("amountCost4", "Cost/Unit", value = 0)),column(3,selectInput("opType4", "Operetive", c("Income" = "1", "Cost" = "0")))),
-                     fluidRow(
-                       column(2, numericInput("ManItmins", "Ins", value = 0)),
-                       column(2, numericInput("ManItmouts", "Outs", value = 0)),
-                       column(2, numericInput("Manins", "Ins", value = 0)),
-                       column(2, numericInput("Manouts", "Outs", value = 0)),
-                       column(4, numericInput("ManttlInvoiceAmount", "Total Amount", value = sum(invoiceDF()$TotalItemPrice)))
+                       column(4, selectInput("transOperator", "Operator", choices = c("Phuong Nguyen"="PN", "MY TO"="MT", "Kia Peynbard"="KP"))),
+                       column(4, selectInput("transType", "Type", choices = c("ReStocking"="ReStocking", "Costs"="Cost", "Injects"="Inject", "Transfers" = "Transfer"), selected = transactionType())),
+                       column(4, dateInput("transDate", "Date", value = Sys.Date()))
                      ),
                      hr(),
-                     fluidRow(column(3,offset = 3 ,actionButton("cleanTheInc", "Clear")), column(3,offset = 2,actionButton("addToBook", "Add")))
-                   ) 
-                )
-      ),
-      tabPanel("Inv Reader",
-               box(width = "full",
-                   verticalLayout(
-                     fluidRow(
-                       column(4, selectInput("operatorName", "Operator", choices = c("Phuong Nguyen"="PN", "MY TO"="MT", "Kia Peynbard"="KP"))),
-                       column(4, fileInput("Invoice", "Insert Invoice",
-                                           accept = c(
-                                             "text/csv",
-                                             "text/comma-separated-values,text/plain",
-                                             ".csv")
-                       )),
-                       column(4, dateInput("invoiceDate", "Date", value = Sys.Date()))
-                     ),
-                     hr(),
+                     fluidRow(column(4, transactionUi()$option_1), column(4,offset = 4, transactionUi()$option_4)),
+                     fluidRow(column(4, transactionUi()$option_2), column(4,offset = 4, transactionUi()$option_3)),
                      dataTableOutput("invoiceTable"),
                      hr(),
-                     fluidRow(
-                       column(4, numericInput("ttlItems", "Total Quantity", value = sum(invoiceDF()$ItemQuantity))),
-                       column(4, ""),
-                       column(4, numericInput("ttlInvoiceAmount", "Total Amount", value = sum(invoiceDF()$TotalItemPrice)))
-                     )
+                     fluidRow(column(4, offset = 5,transactionUi()$option_5))
                    )
-               )
+                )
       )
-    )
+    
   })
-  
   invoiceDF <- reactive({
     inFile <- input$Invoice
     if (is.null(inFile))
       return(NULL)
     read.csv(inFile$datapath)
   })
-  
+  transactionType <- reactive({
+    if(!is.null(input$transType)){
+      return(input$transType)
+    }
+    NULL
+    })
+  transactionUi <- reactive({
+    if(is.null(transactionType())){
+      list(option_1 = p("***Please Select Transaction Type", style = "color:red"))
+    } else if (transactionType() == "ReStocking"){
+      list(
+        option_1 = textInput("transID", "Transaction Id", value = idCreator(loadModule('onlineBusiness', 'trans_table'), "ReStocking")),
+        option_2 = fileInput("Invoice", "Insert Invoice",
+                             accept = c(
+                               "text/csv",
+                               "text/comma-separated-values,text/plain",
+                               ".csv")
+                             ),
+        option_3 = textAreaInput("transInfo", "Transaction Info"),
+        option_4 = selectInput("location", "Location", choices = c("US" = 'US', "Vn" = "Vn")),
+        option_5 = actionButton('trans_ReStock_submit', "Submit")
+      )
+    }
+    else if (transactionType() == "Cost"){
+      list(
+        option_1 = textInput("transID", "Transaction Id", value = idCreator(loadModule('onlineBusiness', 'trans_table'), "Cost")),
+        option_2 = fileInput("Invoice", "Insert Invoice",
+                             accept = c(
+                               "text/csv",
+                               "text/comma-separated-values,text/plain",
+                               ".csv")
+        ),
+        option_3 = textAreaInput("transInfo", "Transaction Info"),
+        option_4 = selectInput("location", "Location", choices = c("US" = 'US', "Vn" = "Vn")),
+        option_5 = actionButton('trans_Cost_submit', "Submit")
+      )
+    }
+    else if (transactionType() == "Inject"){
+      list(
+        option_1 = textInput("transID", "Transaction Id", value = idCreator(loadModule('onlineBusiness', 'trans_table'), "Inject")),
+        option_2 = fileInput("Invoice", "Insert Invoice",
+                             accept = c(
+                               "text/csv",
+                               "text/comma-separated-values,text/plain",
+                               ".csv")
+        ),
+        option_3 = textAreaInput("transInfo", "Transaction Info"),
+        option_4 = selectInput("location", "Location", choices = c("US" = 'US', "Vn" = "Vn")),
+        option_5 = actionButton('trans_Inject_submit', "Submit")
+      )
+    }
+    else if (transactionType() == "Transfer"){
+      list(
+        option_1 = textInput("transID", "Transaction Id", value = idCreator(loadModule('onlineBusiness', 'trans_table'), "Transfer")),
+        option_2 = fileInput("Invoice", "Insert Invoice",
+                             accept = c(
+                               "text/csv",
+                               "text/comma-separated-values,text/plain",
+                               ".csv")
+        ),
+        option_3 = textAreaInput("transInfo", "Transaction Info"),
+        option_4 = selectInput("location", "Location", choices = c("US" = 'US', "Vn" = "Vn")),
+        option_5 = actionButton('trans_Transfer_submit', "Submit")
+      )
+    }
+  })
   output$invoiceTable <- renderDataTable({
     inFile <- input$Invoice
     if (is.null(inFile))
       return(NULL)
     datatable(read.csv(inFile$datapath))
   })
-  
-  
+  observeEvent(input$trans_Transfer_submit, {
+    addOrder(DataCollector("Financial"))
+  })
   # DataCollector ----
   DataCollector <- function(wrapperFrom){
     if (wrapperFrom == "NewItem") {
@@ -289,8 +323,12 @@ shinyServer(function(input, output, session) {
       enteryVector <- list(a = OrderformData(), b = orderEncoder())
     } else if (wrapperFrom == "OrderRow") {
       enteryVector <- c(input[["orderQuantity"]], input[["itemType"]], input[["netP"]], input[["ttlItemPrice"]])
+    } else if (wrapperFrom == "Financial") {
+      ###TODO 
+      
     }
     return(enteryVector)
   }
+  
   
 })

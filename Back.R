@@ -1,6 +1,6 @@
 idCreator <- function(db, name){
   ValidID <- T
-  id <- paste0(substr(name, 1, 1), substr(name, length(name)-1, length(name)) ,round(runif(1, min = 10,max = 1000) * 10000))
+  id <- paste0(chr(round(runif(1, min =65,max = 90))), chr(round(runif(1, min =65,max = 90))) ,round(runif(1, min = 10,max = 1000) * 100), substring(name, 1, 1), substring(name, 2, 2))
   if (length(which(db$id %in% id))!= 0) {
     ValidID <- F
   }
